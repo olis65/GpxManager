@@ -29,7 +29,7 @@ var trackSchema = new mongoose.Schema({
         index: true
     },
     points: {
-        type: [] //{ele: Number}[Number, Number]
+        type: [{ele: Number, lat: Number, lon: Number, time: Date}]
     }
 });
 

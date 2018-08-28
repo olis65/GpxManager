@@ -5,8 +5,7 @@ const express = require('express'),
     accepts = require('accepts'),
     bodyParser = require('body-parser');
 
-const db = require('./openDbConnection.js').db,
-    Track = require('./schemas').Track;
+const Track = require('./schemas').Track;
 
 var router = express.Router();
 router.use(bodyParser.json({ type: 'application/json' }));
@@ -31,7 +30,7 @@ function findTrackByTrackId(req, res, next) {
     var trackId = req.params.id;
 
     Track
-        .find({track_id: trackId})
+        .findOne({track_id: trackId})
         .exec(function (err, track_doc) {
             if(err) {
                 console.log(err);
@@ -45,7 +44,8 @@ function findTrackByTrackId(req, res, next) {
 
 router.get("/", findTracks, function (req, res) {
 
-    console.log(req.tracks[0]);
+    var tracks = req.tracks;
+    console.log(tracks[0]);
 
     var accept = accepts(req);
     switch (accept.type(['json', 'xml/gpx'])) {
@@ -55,13 +55,15 @@ router.get("/", findTracks, function (req, res) {
             break;
         case 'json':
         default:
-            res.send("API GET ALL DEFAULT(JSON)");
+            res.json(tracks);
             break;
     }
 });
 
 router.get("/:id", findTrackByTrackId, function(req, res) {
-    var trackId = req.params.id;
+
+    var track = req.track;
+    console.log(track);
 
     var accept = accepts(req);
     switch (accept.type(['json', 'xml/gpx'])) {
@@ -71,7 +73,7 @@ router.get("/:id", findTrackByTrackId, function(req, res) {
             break;
         case 'json':
         default:
-            res.send("API GET DEFAULT(JSON)");
+            res.json(track);
             break;
     }
 });
