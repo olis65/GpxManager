@@ -1,8 +1,11 @@
+'use strict';
 
+var mongoose = require('mongoose');
 
 var trackSchema = new mongoose.Schema({
     track_id: {
-        type: [String, ""],
+        type: String,
+        required: [true, "Each track need a unique id"],
         unique: true //Index
     },
     name: {
@@ -26,11 +29,11 @@ var trackSchema = new mongoose.Schema({
         index: true
     },
     points: {
-        type: [[Number, Number]]
+        type: [] //{ele: Number}[Number, Number]
     }
 });
 
-var Track = mongoose.model('Track', trackSchema);
+var Track = mongoose.model('raw_track', trackSchema);
 
 module.exports.trackSchema = trackSchema;
 module.exports.Track = Track;

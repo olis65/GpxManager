@@ -5,12 +5,47 @@ const express = require('express'),
     accepts = require('accepts'),
     bodyParser = require('body-parser');
 
-const db = require('./openDbConnection.js').db;
+const db = require('./openDbConnection.js').db,
+    Track = require('./schemas').Track;
 
 var router = express.Router();
 router.use(bodyParser.json({ type: 'application/json' }));
 
-router.get("/", function (req, res) {
+function findTracks(req, res, next) {
+    Track
+        .find({})
+        .limit(10)
+        .skip(0)
+        .exec(function (err, track_docs) {
+            if(err) {
+                console.log(err);
+                res.statusCode = 500;
+                res.json({ errors: [err]});
+            }
+            req.tracks = track_docs;
+            next();
+        });
+}
+
+function findTrackByTrackId(req, res, next) {
+    var trackId = req.params.id;
+
+    Track
+        .find({track_id: trackId})
+        .exec(function (err, track_doc) {
+            if(err) {
+                console.log(err);
+                res.statusCode = 500;
+                res.json({ errors: [err]});
+            }
+            req.track = track_doc;
+            next();
+        });
+}
+
+router.get("/", findTracks, function (req, res) {
+
+    console.log(req.tracks[0]);
 
     var accept = accepts(req);
     switch (accept.type(['json', 'xml/gpx'])) {
@@ -20,12 +55,12 @@ router.get("/", function (req, res) {
             break;
         case 'json':
         default:
-            res.send("API GET DEFAULT(JSON)");
+            res.send("API GET ALL DEFAULT(JSON)");
             break;
     }
 });
 
-router.get("/:id", function(req, res) {
+router.get("/:id", findTrackByTrackId, function(req, res) {
     var trackId = req.params.id;
 
     var accept = accepts(req);
